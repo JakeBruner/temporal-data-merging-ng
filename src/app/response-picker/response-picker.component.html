@@ -1,0 +1,39 @@
+<div>
+  <label for="combobox" class="combobox-label">Assigned to</label>
+  <div class="combobox-container">
+    <input
+      id="combobox"
+      type="text"
+      [(ngModel)]="searchText"
+
+      (keyup)="filterOptions()"
+      class="combobox-input"
+      aria-controls="options"
+      [attr.aria-expanded]="optionsVisible"
+    >
+    <button type="button" class="combobox-button" (click)="toggleOptionsVisibility()">
+      <svg class="icon-dropdown" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <!-- SVG path -->
+      </svg>
+    </button>
+
+    <ul class="options-list" id="options" *ngIf="optionsVisible" role="listbox">
+      <li *ngFor="let option of filteredOptions; let i = index"
+          class="option-item"
+          [class.option-active]="i === selectedIndex"
+          (mouseenter)="setActive(i)"
+          (mouseleave)="setActive(-1)"
+          (click)="selectOption(option)">
+        <div class="option-content">
+          <span class="option-text">{{ option.requestName }}</span>
+          <span class="option-username">{{ option.requestDate }}</span>
+        </div>
+        <span *ngIf="option.selected" class="option-checkmark">
+          <svg class="icon-checkmark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <!-- SVG path -->
+          </svg>
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>

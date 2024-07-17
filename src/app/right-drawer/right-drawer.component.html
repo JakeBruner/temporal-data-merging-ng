@@ -1,0 +1,26 @@
+<div class="drawer-container" [class.open]="isOpen">
+  <div class="drawer">
+    <form (submit)="submitData()">
+      <div class="input-group">
+        <label>TICKER:</label>
+        <div *ngFor="let ticker of tickers; let i = index">
+          <input type="text" [(ngModel)]="tickers[i]" [name]="'ticker-' + i">
+          <button type="button" (click)="removeTicker(i)">Remove</button>
+        </div>
+        <button type="button" (click)="addTicker()">Add Ticker</button>
+      </div>
+
+      <div class="input-group">
+        <label>FIELDS:</label>
+        <div *ngFor="let field of fields; let i = index">
+          <input type="text" [(ngModel)]="fields[i]" [name]="'field-' + i">
+          <button type="button" (click)="removeField(i)">Remove</button>
+        </div>
+        <button type="button" (click)="addField()">Add Field</button>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  <button (click)="toggleDrawer()">Toggle Drawer</button>
+</div>
