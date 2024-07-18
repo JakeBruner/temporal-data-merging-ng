@@ -1,58 +1,60 @@
 <div class="p-5">
   <!-- timeline.component.html -->
   <div>
-    <div class="font-semibold text-lg text-gray-900">
+    <div class="font-semibold text-lg text-neutral-900">
       Timeline of Entries from (some table).
     </div>
   </div>
-  <div #timelineContainer class="timeline-container">
+  <div #timelineContainer class="h-48 w-full overflow-x-auto overflow-y-clip bg-neutral-100 shadow-md px-0 py-5 rounded-lg">
   
-    <div class="timeline" [style.width.px]="timelineWidth">
+    <div class="h-full relative overflow-y-visible mb-5" [style.width.px]="timelineWidth">
       <div *ngFor="let entry of timelineData"
-           class="timeline-entry backdrop-blur-sm"
+           class="z-10 relative overflow-visible h-4 transition-all duration-300 ease-in-out rounded-lg hover:shadow-lg group flex items-end justify-center"
            [style.left]="entry.position"
            [style.width]="entry.width"
-           [style.backgroundColor]="getEntryColor(entry)"
-           (mouseenter)="setHoveredEntry(entry)"
-           (mouseleave)="setHoveredEntry(null)">
+           [style.backgroundColor]="getEntryColor(entry)">
+
+          <div class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 rounded shadow-sm z-50 pointer-events-none transition-all ease-in duration-100 p-2.5 translate-y-full group-hover:translate-y-[113%]   overflow-visible backdrop-blur-lg" [style.backgroundColor]="getEntryColor(entry, 90, 0.9)">
+            <svg class="absolute top-0 -translate-y-full h-4 w-8" [style.fill]="getEntryColor(entry, 90, 0.9)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 16">
+              <path d="M16 0l16 16H0z"></path>
+            </svg>
+            <div class="w-full">
+              <p class="text-sm text-nowrap"><span class="font-semibold">EL: {{ entry.expectedLoss }}</span><br>
+                Start: {{ entry.dateRange.start | date }}<br/>
+                End: {{ entry.dateRange.end | date }}
+              </p>
+            </div>
+            
+
+          </div>
       </div>
   
-      <div *ngFor="let tick of tickMarks" class="tick-mark" [style.left]="tick.position">
-        <div class="tick-line"></div>
-        <div class="tick-label">{{ tick.label }}</div>
+      <div *ngFor="let tick of majorTickMarks" class="absolute bottom-0 -my-4" [style.left.px]="tick.position">
+        <div class="w-px h-36 bg-neutral-300 mx-auto my-0"></div>
+        <div class="text-xs bottom-0 -translate-x-1/2 absolute whitespace-nowrap">{{ tick.label }}</div>
+      </div>
+
+      <div *ngIf="conflictingEntries.length > 0">
+        <div *ngFor="let conflictEntry of conflictingEntries" class="absolute bottom-0 -mb-5">
+          <div class="bg-red-400/30 h-1 rounded-t-md" [style.width.px]="conflictEntry.width" [style.left.px]="conflictEntry.position"></div>
+        </div>
+        <div *ngFor="let conflictEntry of conflictingEntries" class="absolute top-0 -mt-5">
+          <div class="bg-red-400/30 h-1 rounded-b-md" [style.width]="conflictEntry.width" [style.left]="conflictEntry.position"></div>
+        </div>
+
       </div>
     </div>
   </div>
   <div class="pt-5"></div>
-  <div class="timeline-container">
-    <div *ngIf="hoveredEntry" class="entry-tooltip" [style.left]="getTooltipPosition(hoveredEntry).left" [style.top]="getTooltipPosition(hoveredEntry).top">
-      <p>Expected Loss: {{ hoveredEntry.expectedLoss }}</p>
-      <p>Start Date: {{ hoveredEntry.dateRange.start | date }}</p>
-      <p>End Date: {{ hoveredEntry.dateRange.end | date }}</p>
-    </div>
-  
-    <!-- create   -->
-  
-    <div class="timeline-conflicts">
-      <div *ngFor="let conflict of conflictingEntries"
-           class="conflict-entry"
-           [style.left]="conflict.position"
-           [style.width]="conflict.width"
-           [style.backgroundColor]="getEntryColor(conflict)">
-      </div>
-    </div>
-  
-    <div *ngIf="currentEntry" class="current-entry-timeline">
-      <div class="current-entry"
-           [style.left]="currentEntry.position"
-           [style.width]="currentEntry.width">
-      </div>
-    </div>
-  </div>
+
   
   <app-entry-form (newEntry)="setCurrentEntry($event)"></app-entry-form>
   <app-conflict-resolution
     [conflictingEntries]="conflictingEntries"
-    (resolveConflict)="resolveConflict($event.entry, $event.action)">
+    (resolveConflict)="resolveConflict($event.conflictEntry, $event.action)">
   </app-conflict-resolution>
+
+  <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="log(this.timelineData)">I'm just a happy console logger :)</button>
+  <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="log(this.conflictingEntries)">I'm just another happy console logger :)</button>
+
 </div>

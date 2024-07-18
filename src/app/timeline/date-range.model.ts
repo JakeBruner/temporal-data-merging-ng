@@ -20,3 +20,11 @@ export interface TimelineEntry {
   expectedLoss: number;
   dateRange: DateRange;
 }
+
+export interface ConflictingEntry {
+  position?: string;
+  width?: string;
+  entry1: TimelineEntry;
+  entry2: TimelineEntry;
+  intersection: DateRange;
+}

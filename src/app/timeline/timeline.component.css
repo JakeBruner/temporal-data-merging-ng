@@ -1,50 +1,4 @@
-.timeline-container {
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: auto; 
-  position: relative;
-  padding: 20px 0;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
 
-.timeline {
-  height: 20px;
-  position: relative;
-  margin-bottom: 20px; 
-}
-
-.timeline-entry, .conflict-entry, .current-entry {
-  position: absolute;
-  height: 100%;
-  border-radius: 15px;
-  transition: all 0.3s ease;
-  &:hover {
-    transform: scaleY(1.1);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-}
-
-.tick-mark {
-  position: absolute;
-  bottom: -30px;
-  transform: translateX(-50%);
-}
-
-.tick-line {
-  width: 1px;
-  height: 35px;
-  background-color: #888;
-  margin: 0 auto;
-}
-
-.tick-label {
-  font-size: 12px;
-  text-align: center;
-  margin-top: 5px;
-  white-space: nowrap;
-}
 
 .conflict-resolution {
   position: absolute;
@@ -58,20 +12,7 @@
   flex-direction: column;
 }
 
-.entry-tooltip {
-  position: absolute;
-  background-color: white;
-  border-radius: 4px;
-  padding: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  p {
-    margin: 5px 0;
-    font-size: 14px;
-  }
-}
+
 
 @media (max-width: 768px) {
   .timeline-container {
@@ -81,10 +22,5 @@
     height: 20px;
     margin-bottom: 15px;
   }
-  .entry-tooltip, .conflict-resolution {
-    padding: 5px;
-    p {
-      font-size: 12px;
-    }
-  }
+  
 }

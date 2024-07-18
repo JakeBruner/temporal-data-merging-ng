@@ -1,10 +1,9 @@
 // timeline.component.ts
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
-import { TimelineService } from './timeline.service';
-import { DateRange, TimelineEntry } from './date-range.model';
+import { ConflictingEntry, DateRange, TimelineEntry } from './date-range.model';
 import { EntryFormComponent } from './entry-form/entry-form.component';
 import { ConflictResolutionComponent } from './conflict-resolution/conflict-resolution.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Time } from '@angular/common';
 
 @Component({
   standalone: true,
@@ -14,10 +13,11 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, EntryFormComponent, ConflictResolutionComponent]
 })
 export class TimelineComponent implements OnInit, AfterViewInit {
-  @ViewChild('timelineContainer') timelineContainer!: ElementRef;
+  @ViewChild('timelineContainer') timelineContainer!: ElementRef<HTMLDivElement>;
 
+  unmodifiedTimelineData: TimelineEntry[] = [];
   timelineData: TimelineEntry[] = [];
-  conflictingEntries: TimelineEntry[] = [];
+  conflictingEntries: ConflictingEntry[] = [];
   currentEntry: TimelineEntry | null = null;
   hoveredEntry: TimelineEntry | null = null;
   timelineStart: Date = new Date();
@@ -25,10 +25,13 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   containerWidth: number = 0;
   totalDays: number = 0;
   timelineWidth: number = 0;
-  tickMarks: { position: string, label: string }[] = [];
+  majorTickMarks: { position: number, label: string }[] = [];
+  minorTickMarks: string[] = [];
   pixelsPerDay: number = 10; // Default value, will be adjusted
 
-  constructor(private timelineService: TimelineService) {}
+  numberOfMajorTicks = 5;
+
+  constructor() {}
 
   ngOnInit() {
     this.loadTimelineData();
@@ -37,6 +40,7 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.updateContainerWidth();
     this.setupHorizontalScroll();
+    this.scrollToMiddle();
   }
 
   @HostListener('window:resize')
@@ -61,21 +65,46 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     this.generateTickMarks();
   }
 
+  scrollToMiddle() {
+    const e = this.timelineContainer.nativeElement
+    e.scrollLeft = (this.timelineWidth - this.containerWidth) / 2;
+  }
+
   loadTimelineData() {
-    this.timelineService.getTimelineData().subscribe(data => {
+    console.log('Loading timeline data...')
+    // make api call given table and params passed by parent component
+      const data = [
+        { id: 1, expectedLoss: 1.3, dateRange: new DateRange (new Date(2020, 5, 7), new Date(2020, 7, 5)) },
+        { id: 2, expectedLoss: 2.5, dateRange: new DateRange (new Date(2021, 6, 15), new Date(2022, 5, 10)) },
+        { id: 3, expectedLoss: 0.8, dateRange: new DateRange (new Date(2021, 7, 20), new Date(2022, 6, 15)) },
+        { id: 4, expectedLoss: 1.2, dateRange: new DateRange (new Date(2022, 5, 10), new Date(2023, 4, 30))}
+      ];
+
+      this.unmodifiedTimelineData = data;
       this.timelineData = data;
+
+
+      console.log("updating timeline range")
       this.updateTimelineRange();
-      this.checkConflicts();
+      console.log("calculating timeline width")
       this.calculateTimelineWidth();
+      console.log("calculating positions and widths")
       this.calculatePositionsAndWidths();
+      console.log("generating tick marks")
       this.generateTickMarks();
-    });
+      console.log("populating conflicts")
+      this.populateConflicts();
+
+      console.log("load function done")
+      
   }
 
   updateTimelineRange() {
     this.timelineStart = new Date(Math.min(...this.timelineData.map(entry => entry.dateRange.start.getTime())));
     this.timelineEnd = new Date(Math.max(...this.timelineData.map(entry => entry.dateRange.end.getTime())));
     this.totalDays = (this.timelineEnd.getTime() - this.timelineStart.getTime()) / (1000 * 60 * 60 * 24);
+    // get number of divisions as roughly half the number of months between start and end date
+    this.numberOfMajorTicks = Math.ceil(this.totalDays / 60);
   }
 
   calculateTimelineWidth() {
@@ -89,51 +118,44 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   }
 
   calculatePositionsAndWidths() {
-    if (this.timelineWidth === 0 || this.totalDays === 0) return;
+    // if (this.timelineWidth === 0 || this.totalDays === 0) return;
 
     this.timelineData.forEach(entry => {
-      entry.position = this.getEntryPosition(entry);
-      entry.width = this.getEntryWidth(entry);
+      entry.position = this.getEntryPosition(entry.dateRange);
+      entry.width = this.getEntryWidth(entry.dateRange);
     });
-
-    this.conflictingEntries.forEach(entry => {
-      entry.position = this.getEntryPosition(entry);
-      entry.width = this.getEntryWidth(entry);
-    });
-
-    if (this.currentEntry) {
-      this.currentEntry.position = this.getEntryPosition(this.currentEntry);
-      this.currentEntry.width = this.getEntryWidth(this.currentEntry);
-    }
   }
 
-  getEntryPosition(entry: TimelineEntry): string {
-    const daysFromStart = (entry.dateRange.start.getTime() - this.timelineStart.getTime()) / (1000 * 60 * 60 * 24);
+  getEntryPosition(range: DateRange): string {
+    const daysFromStart = (range.start.getTime() - this.timelineStart.getTime()) / (1000 * 60 * 60 * 24);
     const position = daysFromStart * this.pixelsPerDay;
     return `${position}px`;
   }
 
-  getEntryWidth(entry: TimelineEntry): string {
-    const entryDays = (entry.dateRange.end.getTime() - entry.dateRange.start.getTime()) / (1000 * 60 * 60 * 24);
+  getEntryWidth(range: DateRange): string {
+    const entryDays = (range.end.getTime() - range.start.getTime()) / (1000 * 60 * 60 * 24);
     const width = entryDays * this.pixelsPerDay;
     return `${width}px`;
   }
 
+
+
+
   generateTickMarks() {
-    this.tickMarks = [];
+    this.majorTickMarks = [];
     
     // Add start and end tick marks
-    this.tickMarks.push(
-      { position: '0px', label: this.formatDate(this.timelineStart) },
-      { position: `${this.timelineWidth}px`, label: this.formatDate(this.timelineEnd) }
+    this.majorTickMarks.push(
+      { position: 0, label: this.formatDate(this.timelineStart) },
+      { position: this.timelineWidth, label: this.formatDate(this.timelineEnd) }
     );
 
     // Add intermediate tick marks
-    const intervalDays = Math.ceil(this.totalDays / 5); // Divide timeline into 5 parts
-    for (let i = 1; i < 5; i++) {
+    const intervalDays = Math.ceil(this.totalDays / this.numberOfMajorTicks); 
+    for (let i = 1; i < this.numberOfMajorTicks; i++) {
       const date = new Date(this.timelineStart.getTime() + intervalDays * i * 24 * 60 * 60 * 1000);
-      const position = `${intervalDays * i * this.pixelsPerDay}px`;
-      this.tickMarks.push({ position, label: this.formatDate(date) });
+      const position = intervalDays * i * this.pixelsPerDay;
+      this.majorTickMarks.push({ position, label: this.formatDate(date) });
     }
   }
 
@@ -143,94 +165,64 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
   setCurrentEntry(entry: TimelineEntry) {
     this.currentEntry = entry;
-    this.checkConflicts();
+    this.populateConflicts();
     this.calculatePositionsAndWidths();
   }
 
-  setHoveredEntry(entry: TimelineEntry | null) {
-    this.hoveredEntry = entry;
-  }
 
-  getEntryColor(entry: TimelineEntry): string {
+
+
+  getEntryColor(entry: TimelineEntry, lightness = 50, alpha = 0.9): string {
     const hue = (entry.id * 137.508) % 360;
-    return `hsla(${hue}, 50%, 50%, 0.90)`;
+    return `hsla(${hue}, 50%, ${lightness}%, ${alpha})`;
   }
 
-  getTooltipPosition(entry: TimelineEntry): { left: string, top: string } {
-    return { left: entry.position!, top: '60px' };
-  }
-
-  checkConflicts() {
+  populateConflicts() {
     this.conflictingEntries = [];
     for (let i = 0; i < this.timelineData.length; i++) {
       for (let j = i + 1; j < this.timelineData.length; j++) {
         if (this.timelineData[i].dateRange.intersects(this.timelineData[j].dateRange)) {
-          this.conflictingEntries.push(this.timelineData[i], this.timelineData[j]);
+          const intersection = this.timelineData[i].dateRange.intersection(this.timelineData[j].dateRange)!;
+          this.conflictingEntries.push({ entry1: this.timelineData[i], entry2: this.timelineData[j], intersection, width: this.getEntryWidth(intersection), position: this.getEntryPosition(intersection)});
         }
       }
     }
   }
 
   addNewEntry(entry: TimelineEntry) {
-    this.timelineService.addEntry(entry).subscribe(() => {
-      this.loadTimelineData();
-    });
+    this.timelineData.push(entry);
+    // handle diffs later
   }
 
-  resolveConflict(entry: TimelineEntry, action: 'merge-incoming' | 'merge-outgoing') {
-    const conflictingEntry = this.conflictingEntries.find(e => e.dateRange.intersects(entry.dateRange) && e !== entry);
-    if (!conflictingEntry) return;
-
-    const intersection = entry.dateRange.intersection(conflictingEntry.dateRange);
-    if (!intersection) return;
+  resolveConflict(conflictEntry: ConflictingEntry, action: 'merge-incoming' | 'merge-outgoing') {
 
     if (action === 'merge-incoming') {
-      this.mergeEntries(entry, conflictingEntry, intersection);
+      this.mergeEntries(conflictEntry.entry1, conflictEntry.entry2, conflictEntry.intersection);
     } else {
-      this.mergeEntries(conflictingEntry, entry, intersection);
+      this.mergeEntries(conflictEntry.entry2, conflictEntry.entry1, conflictEntry.intersection);
     }
 
-    this.timelineService.updateEntries(this.timelineData).subscribe(() => {
-      this.loadTimelineData();
-    });
+    
   }
 
   private mergeEntries(target: TimelineEntry, source: TimelineEntry, intersection: DateRange) {
-    // Split the target entry if necessary
-    if (target.dateRange.start < intersection.start) {
-      this.timelineData.push({
-        ...target,
-        id: Date.now(), // Generate a new ID
-        dateRange: new DateRange(target.dateRange.start, intersection.start)
-      });
-    }
-    if (target.dateRange.end > intersection.end) {
-      this.timelineData.push({
-        ...target,
-        id: Date.now() + 1, // Generate a new ID
-        dateRange: new DateRange(intersection.end, target.dateRange.end)
-      });
+    // merge entries by calculating the intersection, and then updating the target entry's either start or end date to the intersection's start or end date
+
+    if (target.dateRange.start.getTime() === intersection.start.getTime()) {
+      target.dateRange.end = intersection.end;
+    } else {
+      target.dateRange.start = intersection.start;
     }
 
-    // Update the target entry with the intersection
-    target.dateRange = intersection;
-    target.expectedLoss = source.expectedLoss;
+    console.log('Merged entries:', target, source);
+    console.log('Target was updated from intersection:', intersection);
 
-    // Remove the source entry
-    const sourceIndex = this.timelineData.findIndex(e => e.id === source.id);
-    if (sourceIndex !== -1) {
-      this.timelineData.splice(sourceIndex, 1);
-    }
+
   }
 
-  selectedEntry: TimelineEntry | null = null;
 
-  showEntryDetails(entry: TimelineEntry) {
-    this.selectedEntry = entry;
-  }
-
-  hideEntryDetails() {
-    this.selectedEntry = null;
+  log(message: any) {
+    console.log(message);
   }
 
 }

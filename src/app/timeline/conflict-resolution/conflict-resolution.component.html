@@ -1,11 +1,11 @@
 <!-- conflict-resolution.component.html -->
 <div class="flex flex-col space-y-2 bg-gray-50 rounded-md sm:p-4">
   <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-gray-100 p-4 sm:rounded-md">
-    <p class="font-semibold">Conflict: {{ entry.dateRange.start | date }} - {{ entry.dateRange.end | date }}</p>
+    <p class="font-semibold">Conflict: {{ entry.intersection.start | date }} - {{ entry.intersection.end | date }}</p>
     <div class="m-4">
-      <p>Expected Loss: <span class="text-red-700"> <span class="font-semibold">Old</span> {{ entry.expectedLoss }}</span><span class="text-green-700 font-semibold">-> Overwrite new 12.1example?</span></p>
-      <p>Start Date: {{ entry.dateRange.start | date }}</p>
-      <p>End Date: {{ entry.dateRange.end | date }}</p>
+      <p>Expected Loss: <span class="text-red-700"> <span class="font-semibold">Old</span> {{ entry.entry1.expectedLoss }}</span><span class="text-green-700 font-semibold">-> Overwrite new {{entry.entry2.expectedLoss }}</span></p>
+      <p>Start Date: {{ entry.intersection.start | date }}</p>
+      <p>End Date: {{ entry.intersection.end | date }}</p>
     </div>
     <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-incoming')">Merge Incoming</button>
     <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-outgoing')">Merge Outgoing</button>
