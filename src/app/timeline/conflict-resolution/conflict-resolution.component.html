@@ -1,9 +1,12 @@
 <!-- conflict-resolution.component.html -->
 <div class="flex flex-col space-y-2 bg-gray-50 rounded-md sm:p-4">
-  <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-gray-100 p-4 sm:rounded-md">
+  <div *ngIf="conflictingEntries.length === 0" class="flex items-center font-semibold italic text-neutral-800">
+    No conflicts to resolve.
+  </div>
+  <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-gray-100 p-4 sm:rounded-md relative transition-colors duration-700 ease-in-out"  [id]="entry.intersection.start.getTime() + entry.intersection.end.getTime()">
     
     <div class="font-semibold">
-      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" class="inline-flex -mt-px octicon-git-commit d-none d-md-inline-block">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" class="inline-flex -mt-px">
         <path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path>
     </svg>
       Conflict: 
@@ -22,5 +25,11 @@
     </div>
     <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-outgoing')">Merge Older</button>
     <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-incoming')">Merge Newer</button>
+    <!-- color on right -->
+    <div class="absolute right-0 top-0 w-4 h-1/2 rounded-tr-md" [style.backgroundColor]="getEntryColor(entry.entry1, 80, 1)"></div>
+    <div class="absolute right-0 bottom-0 w-4 h-1/2 rounded-br-md" [style.backgroundColor]="getEntryColor(entry.entry2, 80, 1)"></div>
   </div>
+
+
+
 </div>

@@ -197,8 +197,8 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   addNewEntry(entry: TimelineEntry) {
     this.timelineData.push(entry);
     // handle diffs later
-    this.calculatePositionsAndWidths();
     this.populateConflicts(); 
+    this.calculatePositionsAndWidths();
   }
 
   resolveConflict(conflictEntry: ConflictingEntry, action: 'merge-incoming' | 'merge-outgoing') {
@@ -213,30 +213,18 @@ export class TimelineComponent implements OnInit, AfterViewInit {
         conflictEntry.entry2.dateRange.start = conflictEntry.intersection.end;
 
     }
-    this.calculatePositionsAndWidths();
     this.populateConflicts(); 
+    this.calculatePositionsAndWidths();
   }
 
-    
-  // }
-
-  // private mergeEntries(target: TimelineEntry, source: TimelineEntry, intersection: DateRange) {
-  //   // merge entries by calculating the intersection, and then updating the target entry's either start or end date to the intersection's start or end date
-
-  //   if (target.dateRange.start.getTime() === intersection.start.getTime()) {
-  //     target.dateRange.end = intersection.end;
-  //   } else {
-  //     target.dateRange.start = intersection.start;
-  //   }
-
-  //   console.log('Merged entries:', target, source);
-  //   console.log('Target was updated from intersection:', intersection);
-
-  //   //trigger re-render
-  //   this.calculatePositionsAndWidths();
-  //   this.populateConflicts();
-
-  // }
+  findConflictBelow(entry: ConflictingEntry): void {
+    const id = entry.intersection.start.getTime() + entry.intersection.end.getTime();
+    const element = document.getElementById(id.toString());
+    if (!element) return;
+    element.scrollIntoView({ behavior: 'smooth' });
+    element.setAttribute('style', 'background-color: #f4f3bc;');
+    setTimeout(() => element.removeAttribute('style'), 700);
+  }
 
 
   log(message: any) {
