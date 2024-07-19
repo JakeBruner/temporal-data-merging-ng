@@ -31,6 +31,10 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
   numberOfMajorTicks = 5;
 
+  stagedUpdates: TimelineEntry[] = [];
+  stagedDeletions: TimelineEntry[] = [];
+  stagedAdditions: TimelineEntry[] = [];
+
   constructor() {}
 
   ngOnInit() {
@@ -168,12 +172,11 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric"});
   }
 
-  setCurrentEntry(entry: TimelineEntry) {
-    this.currentEntry = entry;
-    this.populateConflicts();
-    this.calculatePositionsAndWidths();
+  addEntry(entry: TimelineEntry) {
+    this.timelineData.push(entry);
+    // handle diffs later
+    this.triggerUpdate();
   }
-
 
 
   // duplicated in conflict-resolution.component.ts
@@ -188,34 +191,60 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       for (let j = i + 1; j < this.timelineData.length; j++) {
         if (this.timelineData[i].dateRange.intersects(this.timelineData[j].dateRange)) {
           const intersection = this.timelineData[i].dateRange.intersection(this.timelineData[j].dateRange)!;
-          this.conflictingEntries.push({ entry1: this.timelineData[i], entry2: this.timelineData[j], intersection});
+          //enforce that older entry is entry1
+          if (this.timelineData[i].dateRange.start.getTime() > this.timelineData[j].dateRange.start.getTime()) {
+            this.conflictingEntries.push({
+              entry1: this.timelineData[j],
+              entry2: this.timelineData[i],
+              intersection: intersection
+            });
+          } else {
+            this.conflictingEntries.push({
+              entry1: this.timelineData[i],
+              entry2: this.timelineData[j],
+              intersection: intersection
+            });
+          }
+          
         }
       }
     }
   }
-
-  addNewEntry(entry: TimelineEntry) {
-    this.timelineData.push(entry);
-    // handle diffs later
-    this.populateConflicts(); 
-    this.calculatePositionsAndWidths();
+  removeEntry(entry: ConflictingEntry, whichEntry: "old" | "new") {
+    // this.conflictingEntries = this.conflictingEntries.filter(e => e !== entry);
+    const entryToRemove = whichEntry === "old" ? entry.entry2 : entry.entry1;
+    this.timelineData = this.timelineData.filter(e => e !== entryToRemove);
+    this.triggerUpdate();
   }
 
   resolveConflict(conflictEntry: ConflictingEntry, action: 'merge-incoming' | 'merge-outgoing') {
     // merge-incoming: newer entry (2) overwrites
     if (action === 'merge-incoming') {
-
+        if (conflictEntry.entry1.dateRange.start.getTime() === conflictEntry.intersection.start.getTime()) {
+          this.removeEntry(conflictEntry, "new");
+          return;
+        }
         conflictEntry.entry1.dateRange.end = conflictEntry.intersection.start;
-        console.log("option2")
-
+        console.log("option2", conflictEntry)
     } else {
-
+      if (conflictEntry.entry2.dateRange.end.getTime() === conflictEntry.intersection.end.getTime()) {
+        this.removeEntry(conflictEntry, "old");
+        return;
+      }
         conflictEntry.entry2.dateRange.start = conflictEntry.intersection.end;
 
     }
-    this.populateConflicts(); 
+    this.triggerUpdate();
+  }
+  
+  triggerUpdate() {
+    this.populateConflicts();
     this.calculatePositionsAndWidths();
   }
+
+
+
+  
 
   findConflictBelow(entry: ConflictingEntry): void {
     const id = entry.intersection.start.getTime() + entry.intersection.end.getTime();

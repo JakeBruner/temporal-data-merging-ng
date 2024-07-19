@@ -24,4 +24,13 @@ export class ConflictResolutionComponent {
     const hue = (entry.id * 137.508) % 360;
     return `hsla(${hue}, 50%, ${lightness}%, ${alpha})`;
   }
+
+  scrollToOnTimeline(entry: ConflictingEntry) {
+    const timelineElement = document.getElementById('timeline');
+    if (!timelineElement || !entry.position) return;
+
+    timelineElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    timelineElement.scrollLeft = +entry.position.replace("px","") - 70;
+
+  }
 }

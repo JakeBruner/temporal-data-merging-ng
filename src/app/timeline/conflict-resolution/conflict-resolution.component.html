@@ -1,9 +1,9 @@
 <!-- conflict-resolution.component.html -->
-<div class="flex flex-col space-y-2 bg-gray-50 rounded-md sm:p-4">
+<div class="flex flex-col space-y-2 bg-neutral-50 rounded-md sm:p-4">
   <div *ngIf="conflictingEntries.length === 0" class="flex items-center font-semibold italic text-neutral-800">
     No conflicts to resolve.
   </div>
-  <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-gray-100 p-4 sm:rounded-md relative transition-colors duration-700 ease-in-out"  [id]="entry.intersection.start.getTime() + entry.intersection.end.getTime()">
+  <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-neutral-100 p-4 sm:rounded-md relative transition-colors duration-700 ease-in-out" [id]="entry.intersection.start.getTime() + entry.intersection.end.getTime()">
     
     <div class="font-semibold">
       <svg aria-hidden="true" height="16" viewBox="0 0 16 16" class="inline-flex -mt-px">
@@ -11,11 +11,11 @@
     </svg>
       Conflict: 
       <span class="inline-flex items-center rounded-md px-2 py-1 text-sm font-medium ring-1 ring-inset" [style.backgroundColor]="getEntryColor(entry.entry1, 90, 1)" [style.color]="getEntryColor(entry.entry1, 40, 1)" [style.--tw-ring-color]="getEntryColor(entry.entry1,45,0.1)" >
-        Id: {{ entry.entry1.id }} — {{ entry.entry1.dateRange.start | date: 'MM/dd/yyyy' }} to {{ entry.entry1.dateRange.end |  date: 'MM/dd/yyyy' }}
+        Id: {{ entry.entry1.id > 0 ? entry.entry1.id : "new"}} — {{ entry.entry1.dateRange.start | date: 'MM/dd/yyyy' }} to {{ entry.entry1.dateRange.end |  date: 'MM/dd/yyyy' }}
       </span>
        v.s. 
        <span class="inline-flex items-center rounded-md px-2 py-1 text-sm font-medium ring-1 ring-inset" [style.backgroundColor]="getEntryColor(entry.entry2, 90, 1)" [style.color]="getEntryColor(entry.entry2, 40, 1)" [style.--tw-ring-color]="getEntryColor(entry.entry2,45,0.1)" >
-        Id: {{ entry.entry2.id }} — {{ entry.entry2.dateRange.start | date: 'MM/dd/yyyy' }} to {{ entry.entry2.dateRange.end |  date: 'MM/dd/yyyy' }}
+        Id: {{ entry.entry2.id > 0 ? entry.entry2.id : "new" }} — {{ entry.entry2.dateRange.start | date: 'MM/dd/yyyy' }} to {{ entry.entry2.dateRange.end |  date: 'MM/dd/yyyy' }}
       </span>
     </div>
     <div class="m-4">
@@ -23,8 +23,12 @@
       <p>Conflict Start: {{ entry.intersection.start | date }}</p>
       <p>Conflict End: {{ entry.intersection.end | date }}</p>
     </div>
-    <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-outgoing')">Merge Older</button>
-    <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-incoming')">Merge Newer</button>
+    <div class="flex flex-row ml-4 mr-10">
+      <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4" (click)="resolveAction(entry, 'merge-outgoing')">Merge Older</button>
+      <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4" (click)="resolveAction(entry, 'merge-incoming')">Merge Newer</button>
+      
+      <button class="justify-self-end pl-3 pr-3 pt-2 pb-2 bg-neutral-50 text-sm text-neutral-900 italic inline-flex hover:bg-neutral-100 shadow-sm rounded-md ml-auto ring-1 ring-inset ring-neutral-200" (click)="scrollToOnTimeline(entry)">Scroll to on timeline</button>
+    </div>
     <!-- color on right -->
     <div class="absolute right-0 top-0 w-4 h-1/2 rounded-tr-md" [style.backgroundColor]="getEntryColor(entry.entry1, 80, 1)"></div>
     <div class="absolute right-0 bottom-0 w-4 h-1/2 rounded-br-md" [style.backgroundColor]="getEntryColor(entry.entry2, 80, 1)"></div>

@@ -1,11 +1,11 @@
 <div class="p-5">
   <!-- timeline.component.html -->
   <div>
-    <div class="font-semibold text-lg text-neutral-900">
+    <div class="font-semibold text-xl text-neutral-900">
       Timeline of Entries from (some table).
     </div>
   </div>
-  <div #timelineContainer class="h-48 w-full overflow-x-auto overflow-y-clip bg-neutral-100 shadow-md px-0 py-5 rounded-lg">
+  <div #timelineContainer id="timeline" class="h-48 w-full overflow-x-auto overflow-y-clip bg-neutral-100 shadow-md px-0 py-5 rounded-lg">
   
     <div class="h-full relative overflow-y-visible mb-5" [style.width.px]="timelineWidth">
       <!-- main timeline horizontal bar -->
@@ -13,7 +13,7 @@
            class="z-10 relative whitespace-nowrap h-4 transition-all duration-300 ease-in-out rounded-lg hover:shadow-lg group flex items-end justify-center "
            [style.left]="entry.position"
            [style.width]="entry.width"
-           [style.backgroundColor]="getEntryColor(entry)"> <span class="pl-1 text-white text-xs italic">id <span class="font-semibold">{{entry.id}}</span>, value <span class="font-semibold">{{entry.expectedLoss}}</span></span>
+           [style.backgroundColor]="getEntryColor(entry)"> <span class="pl-1 text-white text-xs italic">id <span class="font-semibold">{{entry.id > 0 ? entry.id : "new"}}</span>, value <span class="font-semibold">{{entry.expectedLoss}}</span></span>
 
            <!-- popover on hover -->
           <div class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 rounded shadow-md z-50 pointer-events-none transition-all ease-in duration-100 p-2.5 translate-y-full group-hover:translate-y-[113%] overflow-visible backdrop-blur-lg" [style.backgroundColor]="getEntryColor(entry, 90, 0.9)">
@@ -43,18 +43,38 @@
       </div>
     </div>
   </div>
-  <div class="pt-5"></div>
-
-  
-  <app-entry-form (newEntry)="setCurrentEntry($event)"></app-entry-form>
+  <div class="m-5"></div>
+  <div class="font-semibold text-xl text-neutral-900">
+    Add an entry:  </div>
+  <app-entry-form (newEntry)="addEntry($event)"></app-entry-form>
+  <div class="m-5"></div>
+  <div class="font-semibold text-xl text-neutral-900">
+    Conflicts:
+  </div>
   <app-conflict-resolution
     [conflictingEntries]="conflictingEntries"
     (resolveConflict)="resolveConflict($event.conflictEntry, $event.action)">
   </app-conflict-resolution>
+
+  <div class="m-5"></div>
+
+  <!-- staged changes display -->
+  <div class="font-semibold text-xl text-neutral-900">
+    Staged Changes:
+  </div>
+  <div class="flex flex-col space-y-2 bg-neutral-50 rounded-md sm:p-4">
+    <div *ngIf="true" class="flex items-center font-semibold italic text-neutral-800">
+      No staged changes.
+    </div>  
+    
+  </div>
+
 <div class="p-5 mt-5">
   
     <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="log(this.timelineData)">I'm just a happy console logger :)</button>
     <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="log(this.conflictingEntries)">I'm just another happy console logger :)</button>
 </div>
+
+
 
 </div>
