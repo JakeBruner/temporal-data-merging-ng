@@ -50,12 +50,12 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
   setupHorizontalScroll() {
     const container = this.timelineContainer.nativeElement;
+    const options = { passive: true };
     container.addEventListener('wheel', (e: WheelEvent) => {
       if (e.deltaY !== 0) {
-        e.preventDefault();
-        container.scrollLeft += e.deltaY;
+      container.scrollLeft += e.deltaY;
       }
-    });
+    }, options);
   }
 
   updateContainerWidth() {
@@ -118,11 +118,16 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   }
 
   calculatePositionsAndWidths() {
-    // if (this.timelineWidth === 0 || this.totalDays === 0) return;
+    if (this.timelineWidth === 0 || this.totalDays === 0) return;
 
     this.timelineData.forEach(entry => {
       entry.position = this.getEntryPosition(entry.dateRange);
       entry.width = this.getEntryWidth(entry.dateRange);
+    });
+    this.conflictingEntries.forEach(conflict => {
+      conflict.position = this.getEntryPosition(conflict.intersection);
+      conflict.width = this.getEntryWidth(conflict.intersection
+      );  
     });
   }
 
@@ -160,7 +165,7 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   }
 
   formatDate(date: Date): string {
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric"});
   }
 
   setCurrentEntry(entry: TimelineEntry) {
@@ -171,7 +176,7 @@ export class TimelineComponent implements OnInit, AfterViewInit {
 
 
 
-
+  // duplicated in conflict-resolution.component.ts
   getEntryColor(entry: TimelineEntry, lightness = 50, alpha = 0.9): string {
     const hue = (entry.id * 137.508) % 360;
     return `hsla(${hue}, 50%, ${lightness}%, ${alpha})`;
@@ -183,7 +188,7 @@ export class TimelineComponent implements OnInit, AfterViewInit {
       for (let j = i + 1; j < this.timelineData.length; j++) {
         if (this.timelineData[i].dateRange.intersects(this.timelineData[j].dateRange)) {
           const intersection = this.timelineData[i].dateRange.intersection(this.timelineData[j].dateRange)!;
-          this.conflictingEntries.push({ entry1: this.timelineData[i], entry2: this.timelineData[j], intersection, width: this.getEntryWidth(intersection), position: this.getEntryPosition(intersection)});
+          this.conflictingEntries.push({ entry1: this.timelineData[i], entry2: this.timelineData[j], intersection});
         }
       }
     }
@@ -192,33 +197,46 @@ export class TimelineComponent implements OnInit, AfterViewInit {
   addNewEntry(entry: TimelineEntry) {
     this.timelineData.push(entry);
     // handle diffs later
+    this.calculatePositionsAndWidths();
+    this.populateConflicts(); 
   }
 
   resolveConflict(conflictEntry: ConflictingEntry, action: 'merge-incoming' | 'merge-outgoing') {
-
+    // merge-incoming: newer entry (2) overwrites
     if (action === 'merge-incoming') {
-      this.mergeEntries(conflictEntry.entry1, conflictEntry.entry2, conflictEntry.intersection);
+
+        conflictEntry.entry1.dateRange.end = conflictEntry.intersection.start;
+        console.log("option2")
+
     } else {
-      this.mergeEntries(conflictEntry.entry2, conflictEntry.entry1, conflictEntry.intersection);
+
+        conflictEntry.entry2.dateRange.start = conflictEntry.intersection.end;
+
     }
+    this.calculatePositionsAndWidths();
+    this.populateConflicts(); 
+  }
 
     
-  }
+  // }
 
-  private mergeEntries(target: TimelineEntry, source: TimelineEntry, intersection: DateRange) {
-    // merge entries by calculating the intersection, and then updating the target entry's either start or end date to the intersection's start or end date
+  // private mergeEntries(target: TimelineEntry, source: TimelineEntry, intersection: DateRange) {
+  //   // merge entries by calculating the intersection, and then updating the target entry's either start or end date to the intersection's start or end date
 
-    if (target.dateRange.start.getTime() === intersection.start.getTime()) {
-      target.dateRange.end = intersection.end;
-    } else {
-      target.dateRange.start = intersection.start;
-    }
+  //   if (target.dateRange.start.getTime() === intersection.start.getTime()) {
+  //     target.dateRange.end = intersection.end;
+  //   } else {
+  //     target.dateRange.start = intersection.start;
+  //   }
 
-    console.log('Merged entries:', target, source);
-    console.log('Target was updated from intersection:', intersection);
+  //   console.log('Merged entries:', target, source);
+  //   console.log('Target was updated from intersection:', intersection);
 
+  //   //trigger re-render
+  //   this.calculatePositionsAndWidths();
+  //   this.populateConflicts();
 
-  }
+  // }
 
 
   log(message: any) {

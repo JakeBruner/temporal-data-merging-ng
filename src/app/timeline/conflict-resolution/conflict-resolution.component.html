@@ -1,13 +1,26 @@
 <!-- conflict-resolution.component.html -->
 <div class="flex flex-col space-y-2 bg-gray-50 rounded-md sm:p-4">
   <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-gray-100 p-4 sm:rounded-md">
-    <p class="font-semibold">Conflict: {{ entry.intersection.start | date }} - {{ entry.intersection.end | date }}</p>
-    <div class="m-4">
-      <p>Expected Loss: <span class="text-red-700"> <span class="font-semibold">Old</span> {{ entry.entry1.expectedLoss }}</span><span class="text-green-700 font-semibold">-> Overwrite new {{entry.entry2.expectedLoss }}</span></p>
-      <p>Start Date: {{ entry.intersection.start | date }}</p>
-      <p>End Date: {{ entry.intersection.end | date }}</p>
+    
+    <div class="font-semibold">
+      <svg aria-hidden="true" height="16" viewBox="0 0 16 16" class="inline-flex -mt-px octicon-git-commit d-none d-md-inline-block">
+        <path d="M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"></path>
+    </svg>
+      Conflict: 
+      <span class="inline-flex items-center rounded-md px-2 py-1 text-sm font-medium ring-1 ring-inset" [style.backgroundColor]="getEntryColor(entry.entry1, 90, 1)" [style.color]="getEntryColor(entry.entry1, 40, 1)" [style.--tw-ring-color]="getEntryColor(entry.entry1,45,0.1)" >
+        Id: {{ entry.entry1.id }} — {{ entry.entry1.dateRange.start | date: 'MM/dd/yyyy' }} to {{ entry.entry1.dateRange.end |  date: 'MM/dd/yyyy' }}
+      </span>
+       v.s. 
+       <span class="inline-flex items-center rounded-md px-2 py-1 text-sm font-medium ring-1 ring-inset" [style.backgroundColor]="getEntryColor(entry.entry2, 90, 1)" [style.color]="getEntryColor(entry.entry2, 40, 1)" [style.--tw-ring-color]="getEntryColor(entry.entry2,45,0.1)" >
+        Id: {{ entry.entry2.id }} — {{ entry.entry2.dateRange.start | date: 'MM/dd/yyyy' }} to {{ entry.entry2.dateRange.end |  date: 'MM/dd/yyyy' }}
+      </span>
     </div>
-    <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-incoming')">Merge Incoming</button>
-    <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-outgoing')">Merge Outgoing</button>
+    <div class="m-4">
+      <p>Expected Loss: <span class="text-red-700"> <span class="font-semibold">Old</span> {{ entry.entry1.expectedLoss }}</span><span class="text-green-700 font-semibold"> → Overwrite new {{entry.entry2.expectedLoss }}</span></p>
+      <p>Conflict Start: {{ entry.intersection.start | date }}</p>
+      <p>Conflict End: {{ entry.intersection.end | date }}</p>
+    </div>
+    <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-outgoing')">Merge Older</button>
+    <button class="pl-3 pr-3 pt-2 pb-2 bg-gray-700 text-sm text-gray-50 italic inline-flex hover:bg-gray-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="resolveAction(entry, 'merge-incoming')">Merge Newer</button>
   </div>
 </div>

@@ -12,9 +12,9 @@
            class="z-10 relative overflow-visible h-4 transition-all duration-300 ease-in-out rounded-lg hover:shadow-lg group flex items-end justify-center"
            [style.left]="entry.position"
            [style.width]="entry.width"
-           [style.backgroundColor]="getEntryColor(entry)">
+           [style.backgroundColor]="getEntryColor(entry)"> <span class="pl-1 text-white text-xs italic">id <span class="font-semibold">{{entry.id}}</span>, value <span class="font-semibold">{{entry.expectedLoss}}</span></span>
 
-          <div class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 rounded shadow-sm z-50 pointer-events-none transition-all ease-in duration-100 p-2.5 translate-y-full group-hover:translate-y-[113%]   overflow-visible backdrop-blur-lg" [style.backgroundColor]="getEntryColor(entry, 90, 0.9)">
+          <div class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 rounded shadow-sm z-50 pointer-events-none transition-all ease-in duration-100 p-2.5 translate-y-full group-hover:translate-y-[113%] overflow-visible backdrop-blur-lg" [style.backgroundColor]="getEntryColor(entry, 90, 0.9)">
             <svg class="absolute top-0 -translate-y-full h-4 w-8" [style.fill]="getEntryColor(entry, 90, 0.9)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 16">
               <path d="M16 0l16 16H0z"></path>
             </svg>
@@ -36,12 +36,8 @@
 
       <div *ngIf="conflictingEntries.length > 0">
         <div *ngFor="let conflictEntry of conflictingEntries" class="absolute bottom-0 -mb-5">
-          <div class="bg-red-400/30 h-1 rounded-t-md" [style.width.px]="conflictEntry.width" [style.left.px]="conflictEntry.position"></div>
+          <div class="bg-red-500/70 h-1 transition-all duration-200 group hover:h-5 hover:backdrop-blur-sm relative rounded-t-md" [style.width]="conflictEntry.width" [style.left]="conflictEntry.position"><span class="invisible text-white text-sm pl-1 group-hover:visible">conflict!</span></div>
         </div>
-        <div *ngFor="let conflictEntry of conflictingEntries" class="absolute top-0 -mt-5">
-          <div class="bg-red-400/30 h-1 rounded-b-md" [style.width]="conflictEntry.width" [style.left]="conflictEntry.position"></div>
-        </div>
-
       </div>
     </div>
   </div>

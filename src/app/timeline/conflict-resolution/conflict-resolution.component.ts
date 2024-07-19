@@ -19,4 +19,9 @@ export class ConflictResolutionComponent {
   resolveAction(conflictEntry: ConflictingEntry, action: 'merge-incoming' | 'merge-outgoing') {
     this.resolveConflict.emit({conflictEntry, action });
   }
+
+  getEntryColor(entry: TimelineEntry, lightness = 50, alpha = 0.9): string {
+    const hue = (entry.id * 137.508) % 360;
+    return `hsla(${hue}, 50%, ${lightness}%, ${alpha})`;
+  }
 }
