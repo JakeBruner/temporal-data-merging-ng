@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   selector: 'app-conflict-resolution',
   templateUrl: './conflict-resolution.component.html',
-  styleUrls: ['./conflict-resolution.component.scss'],
   imports: [CommonModule],
   providers: [DatePipe]
 })

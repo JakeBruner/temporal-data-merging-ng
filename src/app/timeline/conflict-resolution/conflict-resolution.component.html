@@ -3,7 +3,7 @@
   <div *ngIf="conflictingEntries.length === 0" class="flex items-center font-semibold italic text-neutral-800">
     No conflicts to resolve.
   </div>
-  <div *ngFor="let entry of conflictingEntries" class="conflict-item bg-neutral-100 p-4 sm:rounded-md relative transition-colors duration-700 ease-in-out" [id]="entry.intersection.start.getTime() + entry.intersection.end.getTime()">
+  <div *ngFor="let entry of conflictingEntries" class="bg-neutral-100 p-4 sm:rounded-md relative transition-colors duration-700 ease-in-out" [id]="entry.intersection.start.getTime() + entry.intersection.end.getTime()">
     
     <div class="font-semibold">
       <svg aria-hidden="true" height="16" viewBox="0 0 16 16" class="inline-flex -mt-px">
@@ -19,7 +19,10 @@
       </span>
     </div>
     <div class="m-4">
-      <p>Expected Loss: <span class="text-red-700"> <span class="font-semibold">Old</span> {{ entry.entry1.expectedLoss }}</span><span class="text-green-700 font-semibold"> → Overwrite new {{entry.entry2.expectedLoss }}</span></p>
+      <p>
+        Expected Loss: 
+        <span class="text-red-700"> Older <span class="font-semibold">{{ entry.entry1.expectedLoss }}</span> 
+      </span><span class="text-green-700"> → Newer <span class="font-semibold">{{entry.entry2.expectedLoss }}</span></span></p>
       <p>Conflict Start: {{ entry.intersection.start | date }}</p>
       <p>Conflict End: {{ entry.intersection.end | date }}</p>
     </div>

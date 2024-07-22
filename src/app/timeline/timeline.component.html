@@ -5,76 +5,104 @@
       Timeline of Entries from (some table).
     </div>
   </div>
-  <div #timelineContainer id="timeline" class="h-48 w-full overflow-x-auto overflow-y-clip bg-neutral-100 shadow-md px-0 py-5 rounded-lg">
-  
+  <div #timelineContainer id="timeline"
+    class="h-48 w-full overflow-x-auto overflow-y-clip bg-neutral-100 shadow-md px-0 py-5 rounded-lg">
     <div class="h-full relative overflow-y-visible mb-5" [style.width.px]="timelineWidth">
       <!-- main timeline horizontal bar -->
       <div *ngFor="let entry of timelineData"
-           class="z-10 relative whitespace-nowrap h-4 transition-all duration-300 ease-in-out rounded-lg hover:shadow-lg group flex items-end justify-center "
-           [style.left]="entry.position"
-           [style.width]="entry.width"
-           [style.backgroundColor]="getEntryColor(entry)"> <span class="pl-1 text-white text-xs italic">id <span class="font-semibold">{{entry.id > 0 ? entry.id : "new"}}</span>, value <span class="font-semibold">{{entry.expectedLoss}}</span></span>
+        class="z-10 relative whitespace-nowrap h-4 transition-all duration-300 ease-in-out rounded-lg hover:shadow-lg group flex items-end justify-center"
+        [style.left]="entry.position" [style.width]="entry.width" [style.backgroundColor]="getEntryColor(entry)">
+        <span class="pl-1 text-white text-xs italic">id
+          <span class="font-semibold">{{
+            entry.id > 0 ? entry.id : "new"
+            }}</span>, value
+          <span class="font-semibold">{{ entry.expectedLoss }}</span></span>
 
-           <!-- popover on hover -->
-          <div class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 rounded shadow-md z-50 pointer-events-none transition-all ease-in duration-100 p-2.5 translate-y-full group-hover:translate-y-[113%] overflow-visible backdrop-blur-lg" [style.backgroundColor]="getEntryColor(entry, 90, 0.9)">
-            <svg class="absolute top-0 -translate-y-full h-4 w-8" [style.fill]="getEntryColor(entry, 90, 0.9)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 16">
-              <path d="M16 0l16 16H0z"></path>
-            </svg>
-            <div class="w-full">
-              <p class="text-sm text-nowrap"><span class="font-semibold">EL: {{ entry.expectedLoss }}</span><br>
-                Start: {{ entry.dateRange.start | date }}<br/>
-                End: {{ entry.dateRange.end | date }}
-              </p>
-            </div>
-            
-
+        <!-- popover on hover -->
+        <div
+          class="absolute invisible opacity-0 group-hover:visible group-hover:opacity-100 rounded shadow-md z-50 pointer-events-none transition-all ease-in duration-100 p-2.5 translate-y-full group-hover:translate-y-[113%] overflow-visible backdrop-blur-lg"
+          [style.backgroundColor]="getEntryColor(entry, 90, 0.9)">
+          <svg class="absolute top-0 -translate-y-full h-4 w-8" [style.fill]="getEntryColor(entry, 90, 0.9)"
+            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 16">
+            <path d="M16 0l16 16H0z"></path>
+          </svg>
+          <div class="w-full">
+            <p class="text-sm text-nowrap">
+              <span class="font-semibold">EL: {{ entry.expectedLoss }}</span><br />
+              Start: {{ entry.dateRange.start | date }}<br />
+              End: {{ entry.dateRange.end | date }}
+            </p>
           </div>
+        </div>
       </div>
-  
+
       <div *ngFor="let tick of majorTickMarks" class="absolute bottom-0 -my-4" [style.left.px]="tick.position">
         <div class="w-px h-36 bg-neutral-300 mx-auto my-0"></div>
-        <div class="text-xs bottom-0 -translate-x-1/2 absolute whitespace-nowrap">{{ tick.label }}</div>
+        <div class="text-xs bottom-0 -translate-x-1/2 absolute whitespace-nowrap">
+          {{ tick.label }}
+        </div>
       </div>
 
       <div *ngIf="conflictingEntries.length > 0">
         <div *ngFor="let conflictEntry of conflictingEntries" class="absolute bottom-0 -mb-5">
-          <div class="bg-red-500/70 h-1 transition-all duration-300 ease-in-out group hover:h-5 hover:backdrop-blur-sm hover:bg-red-600/70 relative rounded-t-md" [style.width]="conflictEntry.width" [style.left]="conflictEntry.position" (mousedown)="findConflictBelow(conflictEntry)"><span class="invisible text-white text-sm pl-1 group-hover:visible">conflict!</span></div>
+          <div
+            class="bg-red-500/70 h-1 transition-all duration-300 ease-in-out group hover:h-5 hover:backdrop-blur-sm hover:bg-red-600/70 relative rounded-t-md"
+            [style.width]="conflictEntry.width" [style.left]="conflictEntry.position"
+            (mousedown)="findConflictBelow(conflictEntry)">
+            <span class="invisible text-white text-sm pl-1 group-hover:visible">conflict!</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
   <div class="m-5"></div>
-  <div class="font-semibold text-xl text-neutral-900">
-    Add an entry:  </div>
+  <div class="font-semibold text-xl text-neutral-900">Add an entry:</div>
   <app-entry-form (newEntry)="addEntry($event)"></app-entry-form>
   <div class="m-5"></div>
-  <div class="font-semibold text-xl text-neutral-900">
-    Conflicts:
-  </div>
-  <app-conflict-resolution
-    [conflictingEntries]="conflictingEntries"
+  <div class="font-semibold text-xl text-neutral-900">Conflicts:</div>
+  <app-conflict-resolution [conflictingEntries]="conflictingEntries"
     (resolveConflict)="resolveConflict($event.conflictEntry, $event.action)">
   </app-conflict-resolution>
 
   <div class="m-5"></div>
 
   <!-- staged changes display -->
-  <div class="font-semibold text-xl text-neutral-900">
-    Staged Changes:
-  </div>
-  <div class="flex flex-col space-y-2 bg-neutral-50 rounded-md sm:p-4">
-    <div *ngIf="true" class="flex items-center font-semibold italic text-neutral-800">
+  <div class="font-semibold text-xl text-neutral-900">Staged Changes:</div>
+  <div class="flex flex-col space-y-5 bg-neutral-50 rounded-md sm:p-4">
+    <div *ngIf="!changesStaged()" class="flex items-center font-semibold italic text-neutral-800">
       No staged changes.
-    </div>  
+    </div>
+    <!-- unfortunatly, code duplication is a must to maintain three separate "staged" arrays -->
+    <!-- UPDATES -->
+    <div class="flex flex-col space-y-5 mb-2" *ngIf="stagedUpdates.length > 0">
+      <div *ngFor="let update of stagedUpdates">
+        <app-update-card [entry]="update" [originalEntry]="getOldEntry(update)" changeType="update" (undo)="undo($event.id, $event.action)"></app-update-card>
+      </div>
+    </div>
     
+
+      <!-- ADDITIONS -->
+      <div class="flex flex-col space-y-5 mb-2" *ngIf="stagedAdditions.length > 0">
+        <div *ngFor="let addition of stagedAdditions">
+          <app-update-card [entry]="addition" changeType="create" (undo)="undo($event.id, $event.action)"></app-update-card>
+        </div>
+      </div>
+      <!-- DELETES -->
+      <div class="flex flex-col space-y-5 mb-2" *ngIf="stagedDeletions.length > 0">
+        <div *ngFor="let deletion of stagedDeletions">
+          <app-update-card [entry]="deletion" [originalEntry]="getOldEntry(deletion)" changeType="delete" (undo)="undo($event.id, $event.action)"></app-update-card>
+        </div>
+      </div>
+
+
+      <div class="" *ngIf="changesStaged()">
+        <button
+          class="pl-3 pr-3 pt-2 pb-2 bg-emerald-700 ring-1 ring-inset ring-emerald-500 text-sm text-neutral-50 italic inline-flex hover:bg-emerald-600 shadow-sm rounded-md mr-4 font-semibold items-center"
+          (click)="log(this.timelineData)">
+          Push Changes
+        </button>
+      </div>
+
+
   </div>
-
-<div class="p-5 mt-5">
-  
-    <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="log(this.timelineData)">I'm just a happy console logger :)</button>
-    <button class="pl-3 pr-3 pt-2 pb-2 bg-neutral-700 text-sm text-neutral-50 italic inline-flex hover:bg-neutral-600 shadow-sm rounded-md mr-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-600" (click)="log(this.conflictingEntries)">I'm just another happy console logger :)</button>
-</div>
-
-
-
 </div>
