@@ -1,27 +1,38 @@
-# AngularTest
+# Porting into Company Code
+Currently this uses hardcoded example data in timeline.component.ts's loadTimelineData(). This codebase should be imported inside a wrapper component (to slide over on `tables` with ineffective/effective) that passes down the data given the identifying data sufficent to know that two entries correspond to the "same" piece of data (e.g., one bond's el). This component passes three "changes" arrays, corresponding to updates, deletions, and creations. These should be hooked into a form submit / (onclick) action that provides this to the API Controller in C#. Currently, the data types don't keep all the context of the entry itself. This can be handled in a number of ways: 1) make the original table entry, serialized in json, a key of the data type. Like:
+```ts
+interface Entry {
+  id: number;
+  expectedLoss: number;
+  dateRange: DateRange;
+  tableEntry: {[key: string]: string | number | Date | boolean};
+}
+```
+Or otherwise, the types can be kept slim like it is currently, and on pushing staged changes, use the id column to relink the changes here with the actual database types in C#.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.7.
+## importing styles
+For the styles, I used [TailwindCss](https://tailwindcss.com/) to speed up development. While I highly(!) reccomend it, it probably doesn't make sense to create a dependency on it in WebApp. Most efficently, you can build the app then grab the generated tailwind css file, which only includes classes I used here, and import that as the stylesheet of the page and components. 
+
+To do so, run `ng build` then navigate to the `dist/temporal-data-merging-ng` directory and look for the `styles-[...].css` file. This is the stylesheet for the entire app. Bring it to the codebase and point to it in the `@Component` or `@Module` decorators for each `*.component.ts` file.
+
+Otherwise, it's possible to use a tailwindcss CDN, except this has a large bundle size and negates the benefits that these utility classes bring. 
+
+## note
+On another note, it's entirely possible that this functionality contains issues that need to be smoothed over. Including some finniky things like the rendering of the timeline. I didn't have bandwidth to comb through these, since I started on other projects. Feel free to reach out if you need any clarification. Most of this 'drawing' and 'sizing' logic is contained in: ```this.updateTimelineRange();
+    this.calculateTimelineWidth();
+    this.calculatePositionsAndWidths();
+    this.generateTickMarks();
+    this.populateConflicts();```
+
+On a performance note, this is well-optimized on modern angular, but it's possible performance issues could come from the earlier code target or the outdated angular version. 
+
+In general, it's important the parent component forgo rendering this in the DOM at all when its not in use. E.g., a `*ngIf` directive.
+
 
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
