@@ -30,6 +30,7 @@ On a performance note, this is well-optimized on modern angular, but it's possib
 
 In general, it's important the parent component forgo rendering this in the DOM at all when its not in use. E.g., a `*ngIf` directive.
 
+# Running Locally
 
 ## Development server
 
