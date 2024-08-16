@@ -1,5 +1,5 @@
 import { Component, Input, Output, OnInit, EventEmitter  } from '@angular/core';
-import { TimelineEntry, DateRange } from '../timeline/date-range.model';
+import { TimelineEntry, DateRange } from '../date-range.model';
 import { CommonModule, DatePipe } from '@angular/common';
 
 
@@ -40,15 +40,10 @@ getEntryColor(entry: TimelineEntry, lightness = 50, alpha = 0.9): string {
 
 getDiffedRange(): "start" | "end" | "both" | null {
   if (!this.originalEntry) return null;
-  if (this.entry.dateRange.start.getTime() !== this.originalEntry.dateRange.start.getTime() && this.entry.dateRange.end !== this.originalEntry.dateRange.end) {
-    return "both";
-  }
-  if (this.entry.dateRange.start.getTime() !== this.originalEntry.dateRange.start.getTime()) {
-    return "start";
-  }
-  if (this.entry.dateRange.end !== this.originalEntry.dateRange.end) {
-    return "end";
-  }
+  if (this.changeType !== "update") return null;
+  if (this.originalEntry.dateRange.start.getTime() !== this.entry.dateRange.start.getTime() && this.originalEntry.dateRange.end.getTime() !== this.entry.dateRange.end.getTime()) return "both";
+  if (this.originalEntry.dateRange.start.getTime() !== this.entry.dateRange.start.getTime()) return "start";
+  if (this.originalEntry.dateRange.end.getTime() !== this.entry.dateRange.end.getTime()) return "end";
   return null;
 }
 /* tuple is original date -> new date */

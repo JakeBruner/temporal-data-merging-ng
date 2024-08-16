@@ -11,28 +11,12 @@ import { ConflictingEntry, DateRange, TimelineEntry } from './date-range.model';
 import { EntryFormComponent } from './entry-form/entry-form.component';
 import { ConflictResolutionComponent } from './conflict-resolution/conflict-resolution.component';
 import { CommonModule, Time } from '@angular/common';
-import { UpdateCardComponent } from '../update-card/update-card.component';
+import { UpdateCardComponent } from './update-card/update-card.component';
 
 @Component({
   standalone: true,
   selector: 'app-timeline',
   templateUrl: './timeline.component.html',
-  styles: `#timeline::-webkit-scrollbar{
-  width: 18px;
-  border-radius: 20px;
-}
-
-#timeline::-webkit-scrollbar-track{
-  background: #CCEEF4;
-
-  border-radius: 20px;
-}
-::-webkit-scrollbar-thumb{
-  width: 24px;
-  background: #49AEC0;
-  border: 5px solid #CCEEF4;
-  border-radius: 15px;
-}`,
   imports: [
     CommonModule,
     EntryFormComponent,
@@ -88,18 +72,13 @@ export class TimelineComponent implements OnInit, AfterViewInit {
     this.updateContainerWidth();
   }
 
-  setupHorizontalScroll() {
-    // const container = this.timelineContainer.nativeElement;
-    // const options = { passive: false };
-    // container.addEventListener(
-    //   'wheel',
-    //   (e: WheelEvent) => {
-    //     if (e.deltaY !== 0) {
-    //       container.scrollLeft += e.deltaY;
-    //     }
-    //   },
-    //   options
-    // );
+  
+  setupHorizontalScroll() { 
+    const e = this.timelineContainer.nativeElement;
+    e.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      e.scrollLeft += event.deltaY;
+    });
   }
 
   updateContainerWidth() {

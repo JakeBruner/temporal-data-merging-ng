@@ -37,16 +37,11 @@
           Deleting Entry: <span class="font-semibold">{{ entry.id }}</span>
         </p>
       </div>
-
-      <!-- <p>
-      Expected Loss:
-      <span class="text-red-700">
-        <span class="font-semibold">Old</span>
-        {{ originalEntry?.dateRange }}</span
-      ><span class="text-green-700 font-semibold">
-        → Overwrite new {{ entry.dateRange }}</span
-      >
-    </p> -->
+      <div *ngIf="changeType === 'create'">
+        <p class="text-sm font-normal">
+          <span class="text-green-700 font-semibold">Start +{{ entry.dateRange.start.toLocaleDateString() }}<br>End {{ entry.dateRange.end.toLocaleDateString() }}</span>
+        </p>
+      </div>  
     </div>
   </div>
   
