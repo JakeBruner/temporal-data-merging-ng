@@ -13,7 +13,7 @@ Or otherwise, the types can be kept slim like it is currently, and on pushing st
 ## Importing Styles
 For the styles, I used [TailwindCSS](https://tailwindcss.com/) to speed up development. While I highly(!) reccomend it, it probably doesn't make sense to create a dependency on it in WebApp. Most efficently, you can build the app then grab the generated tailwind css file, which only includes classes I used here, and import that as the stylesheet of the page and components. 
 
-To do so, run `ng build` then navigate to the `dist/temporal-data-merging-ng` directory and look for the `styles-[...].css` file. This is the stylesheet for the entire app. Bring it to the codebase and point to it in the `@Component` or `@Module` decorators for each `*.component.ts` file.
+To do so, run `npm run build` then navigate to the `dist/angular-test/browser` directory and look for the `styles-[...].css` file. This is the stylesheet for the entire app. Bring it to the codebase and point to it in the `@Component` or `@Module` decorators for each `*.component.ts` file.
 
 Otherwise, it's possible to use a tailwindcss CDN, except this has a large bundle size and negates the benefits that these utility classes bring. 
 
@@ -32,10 +32,18 @@ In general, it's important the parent component forgo rendering this in the DOM 
 
 # Running Locally
 
+## Install dependencies
+
+Run `npm ci` from the project root. This installs the exact dependency versions recorded in the committed `package-lock.json`, so every machine gets the same tree. The Angular CLI is installed as a local dev dependency, so no global Angular CLI is required.
+
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Run `npm start` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files. (`npm start` runs `ng serve` from the locally installed Angular CLI.)
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Run `npm run build` to build the project. This runs `ng build` from the locally installed Angular CLI. The build artifacts will be stored in the `dist/angular-test/browser` directory (the Angular application builder writes the browser bundle under `dist/angular-test/browser`).
+
+## Prototype behavior: Push Changes
+
+The **Push Changes** button currently only logs the timeline data to the browser console (it calls `log(this.timelineData)`, which uses `console.log`). It does not persist or save data to a backend, API, or database; no persistence is wired up yet. Check the browser developer console to see the output.
