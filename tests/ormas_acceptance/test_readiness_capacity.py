@@ -1,8 +1,15 @@
 """Frozen assertions about supplied aggregate capacity, never live admission."""
 
+from ormas_acceptance import run
+
+
 import pytest
 
-from readiness_fixtures import PYTHON, capacity, codes, invoke, scenario
+from readiness_fixtures import PYTHON, capacity, codes, invoke as invoke_fixture, scenario
+
+
+def invoke(spec):
+    return invoke_fixture(spec, runner=run)
 
 
 def _capacity_case(name, changes=None, *, missing=None, absent=False, expected=None):

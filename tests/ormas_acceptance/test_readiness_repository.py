@@ -1,5 +1,8 @@
 """Frozen repository diagnostics through the external candidate bridge."""
 
+from ormas_acceptance import run
+
+
 import base64
 import json
 
@@ -11,9 +14,13 @@ from readiness_fixtures import (
     capacity,
     codes,
     digest,
-    invoke,
+    invoke as invoke_fixture,
     scenario,
 )
+
+
+def invoke(spec):
+    return invoke_fixture(spec, runner=run)
 
 
 def section(report, name):

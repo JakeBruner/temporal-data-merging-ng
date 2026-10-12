@@ -2,7 +2,14 @@
 import copy
 import json
 import pytest
-from readiness_fixtures import scenario, invoke, codes, digest, capacity
+from readiness_fixtures import scenario, invoke as invoke_fixture, codes, digest, capacity
+
+from ormas_acceptance import run
+
+
+
+def invoke(spec):
+    return invoke_fixture(spec, runner=run)
 
 
 @pytest.mark.parametrize("which", ["catalog", "inventory", "capacity"])

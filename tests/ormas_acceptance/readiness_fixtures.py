@@ -75,8 +75,8 @@ with tempfile.TemporaryDirectory(prefix='ormas-readiness-') as td:
     print(json.dumps({'returncode':result.returncode,'stdout':result.stdout,'stderr':result.stderr,'before':before,'after':after,'repeated':repeated}))
 """
 
-def invoke(spec):
-    observed=run(['python3','-c',_SCRIPT,json.dumps(spec)],timeout_s=30)
+def invoke(spec, runner=run):
+    observed=runner(['python3','-c',_SCRIPT,json.dumps(spec)],timeout_s=30)
     assert observed['returncode']==0, 'fixture driver failed: '+observed.get('output','')[-400:]
     try:
         result=json.loads(observed['output'])
